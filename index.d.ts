@@ -217,6 +217,7 @@ declare global {
       BROWSERSLIST_IGNORE_OLD_DATA?: string
       BROWSERSLIST_STATS?: string
       BROWSERSLIST_ROOT_PATH?: string
+      BROWSERSLIST_NOW?: string
     }
   }
 }

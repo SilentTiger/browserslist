@@ -213,7 +213,7 @@ function filterByYear(since, context) {
     if (!data) return selected
     var versions = Object.keys(data.releaseDate).filter(function (v) {
       var date = data.releaseDate[v]
-      return date !== null && date >= since
+      return date !== null && date >= since && date <= env.getNowDate() / 1000
     })
     return selected.concat(versions.map(nameMapper(data.name)))
   }, [])
@@ -762,7 +762,7 @@ var QUERIES = {
     matches: ['years'],
     regexp: /^last\s+(\d*.?\d+)\s+years?$/i,
     select: function (context, node) {
-      return filterByYear(Date.now() - YEAR * node.years, context)
+      return filterByYear(env.getNowDate() - YEAR * node.years, context)
     }
   },
   since_y: {
@@ -1099,12 +1099,11 @@ var QUERIES = {
     matches: [],
     regexp: /^maintained\s+node\s+versions$/i,
     select: function (context) {
-      var now = Date.now()
       var queries = Object.keys(jsEOL)
         .filter(function (key) {
           return (
-            now < Date.parse(jsEOL[key].end) &&
-            now > Date.parse(jsEOL[key].start) &&
+            env.getNowDate() < Date.parse(jsEOL[key].end) &&
+            env.getNowDate() > Date.parse(jsEOL[key].start) &&
             isEolReleased(key)
           )
         })

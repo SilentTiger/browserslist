@@ -250,6 +250,18 @@ function normalizeUsageData(usageData, data) {
 }
 
 module.exports = {
+  getNowDate: function getNowDate() {
+    if (process.env.BROWSERSLIST_NOW) {
+      var now = new Date(process.env.BROWSERSLIST_NOW)
+      if (Object.prototype.toString.call(now) === "[object Date]") {
+        if (isNaN(now)) {
+          throw new Error('BROWSERSLIST_NOW has the wrong date format.')
+        }
+        return now.getTime()
+      }
+    }
+    return Date.now()
+  },
   loadQueries: function loadQueries(ctx, name) {
     if (!ctx.dangerousExtend && !process.env.BROWSERSLIST_DANGEROUS_EXTEND) {
       checkExtend(name)
@@ -474,6 +486,7 @@ module.exports = {
 
     var latest = latestReleaseTime(agentsObj)
     var monthsPassed = getMonthsPassed(latest)
+    var halfYearAgo = this.getNowDate() - TIME_TO_UPDATE_CANIUSE
 
     if (latest !== 0 && monthsPassed >= 6) {
       var months = monthsPassed + ' ' + (monthsPassed > 1 ? 'months' : 'month')
