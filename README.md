@@ -692,6 +692,12 @@ with [environment variables]:
   BROWSERSLIST_DANGEROUS_EXTEND=1 npx webpack
    ```
 
+* `BROWSERSLIST_NOW` to specific the current time.
+
+   ```sh
+  BROWSERSLIST_NOW=2023-10-31T12:41:03.409Z npx webpack
+   ```
+
 [environment variables]: https://en.wikipedia.org/wiki/Environment_variable
 
 

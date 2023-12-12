@@ -3,6 +3,9 @@ var BrowserslistError = require('./error')
 function noop() {}
 
 module.exports = {
+  getNowDate: function getNowDate() {
+    return Date.now()
+  },
   loadQueries: function loadQueries() {
     throw new BrowserslistError(
       'Sharable configs are not supported in client-side build of Browserslist'

@@ -169,6 +169,18 @@ function normalizeUsageData(usageData, data) {
 }
 
 module.exports = {
+  getNowDate: function getNowDate() {
+    if (process.env.BROWSERSLIST_NOW) {
+      var now = new Date(process.env.BROWSERSLIST_NOW)
+      if (Object.prototype.toString.call(now) === "[object Date]") {
+        if (isNaN(now)) {
+          throw new Error('BROWSERSLIST_NOW has the wrong date format.')
+        }
+        return now.getTime()
+      }
+    }
+    return Date.now()
+  },
   loadQueries: function loadQueries(ctx, name) {
     if (!ctx.dangerousExtend && !process.env.BROWSERSLIST_DANGEROUS_EXTEND) {
       checkExtend(name)
@@ -390,7 +402,7 @@ module.exports = {
     if (process.env.BROWSERSLIST_IGNORE_OLD_DATA) return
 
     var latest = latestReleaseTime(agentsObj)
-    var halfYearAgo = Date.now() - TIME_TO_UPDATE_CANIUSE
+    var halfYearAgo = this.getNowDate() - TIME_TO_UPDATE_CANIUSE
 
     if (latest !== 0 && latest < halfYearAgo) {
       console.warn(

@@ -1,25 +1,14 @@
 let { test } = require('uvu')
-let { equal } = require('uvu/assert')
+let { equal, throws } = require('uvu/assert')
 
 delete require.cache[require.resolve('..')]
 let browserslist = require('..')
 
-let RealDate = Date
 let originData = { ...browserslist.data }
 let originWarn = console.warn
 
-function mockDate(iso) {
-  global.Date = function (self) {
-    Object.getPrototypeOf(RealDate.prototype).constructor.call(self)
-    return new RealDate(iso)
-  }
-  global.Date.now = function () {
-    return new RealDate(iso).valueOf()
-  }
-}
-
 test.before.each(() => {
-  mockDate('2018-01-01T00:00:00z')
+  process.env.BROWSERSLIST_NOW = '2018-01-01T00:00:00z'
   browserslist.data = {
     ie: {
       name: 'ie',
@@ -51,19 +40,12 @@ test.before.each(() => {
 })
 
 test.after.each(() => {
-  global.Date = RealDate
+  delete process.env.BROWSERSLIST_NOW
   browserslist.data = originData
 })
 
 test('selects versions released within last X years', () => {
-  equal(
-    browserslist('last 2 years'),
-    [
-      'edge 16',
-      'edge 15',
-      'edge 14'
-    ]
-  )
+  equal(browserslist('last 2 years'), ['edge 16', 'edge 15', 'edge 14'])
 })
 
 test('selects versions released within last year', () => {
@@ -75,17 +57,20 @@ test('supports year fraction', () => {
 })
 
 test('is case insensitive', () => {
-  equal(
-    browserslist('Last 5 years'),
-    [
-      'edge 16',
-      'edge 15',
-      'edge 14',
-      'edge 13',
-      'edge 12',
-      'ie 11'
-    ]
-  )
+  equal(browserslist('Last 5 years'), [
+    'edge 16',
+    'edge 15',
+    'edge 14',
+    'edge 13',
+    'edge 12',
+    'ie 11'
+  ])
+})
+
+test('throws when BROWSERSLIST_NOW is not a date', () => {
+  process.env.BROWSERSLIST_NOW = 'not a date'
+  browserslist.clearCaches();
+  throws(() => browserslist('last 1 year'), /BROWSERSLIST_NOW/)
 })
 
 test.run()
